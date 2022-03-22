@@ -1,13 +1,13 @@
 <?php
 
-namespace Magein\Common\Upload\Driver;
+namespace Magein\Upload\Driver;
 
 use Illuminate\Http\UploadedFile;
 use Magein\Common\AssetPath;
 use Magein\Common\MsgContainer;
 use Magein\Common\Upload\UploadData;
 
-class UploadLocal
+class Local
 {
     /**
      * 上传的标记
