@@ -1,0 +1,29 @@
+{
+  "name": "magein/laravel-upload",
+  "description": "laravel常用的工具类",
+  "keywords": [
+    "laravel",
+    "tools"
+  ],
+  "homepage": "https://github.com/magein/laravel-upload",
+  "authors": [
+    {
+      "name": "magein",
+      "homepage": "https://github.com/magein"
+    }
+  ],
+  "license": "MIT",
+  "require": {
+    "php": "^7.4|^8.0",
+    "ext-json": "*",
+    "laravel/framework": "~8.54"
+  },
+  "autoload": {
+    "psr-4": {
+      "Magein\\Upload\\": "src/"
+    }
+  },
+  "autoload-dev": {},
+  "suggest": {},
+  "extra": {}
+}
