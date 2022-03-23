@@ -1,8 +1,8 @@
 <?php
 
-namespace Magein\Upload;
+namespace Magein\Upload\Lib;
 
-class UploadData
+class UploadConfig
 {
     const IMAGE = ['jpg', 'png', 'gif', 'jpeg'];
 
@@ -12,25 +12,34 @@ class UploadData
 
     const FILE = ['doc', 'docx', 'txt', 'xls', 'xlsx', 'pdf', 'ppt', 'md'];
 
+    const MIME_IMAGE = 1;
+    const MIME_VIDEO = 2;
+    const MIME_AUDIO = 3;
+    const MIME_FILE = 4;
+
     /**
-     * 单位K
+     * 单位 K
      * @var int
      */
-    private int $size = 0;
+    protected int $size = 0;
 
     /**
      * 文件的扩展名称
      * @var array
      */
-    private array $extend = [];
+    protected array $extend = [];
 
     /**
      * 保存路径
      * @var string
      */
-    private string $save_path = '';
+    protected string $save_path = '';
 
-    private $call = null;
+    /**
+     * 上传事件
+     * @var UploadEvent|null
+     */
+    protected ?UploadEvent $event = null;
 
     /**
      * @param string $save_path
@@ -47,37 +56,45 @@ class UploadData
         $this->setSize($size);
     }
 
-    public function setByMime($mime, $return_int = false)
+    /**
+     * 获取mime的常量值
+     * @param string $mime
+     * @param bool $setting 传递则根据mime类型自动设置参数
+     * @return int
+     */
+    public function getMimeType(string $mime, bool $setting = true): int
     {
-        $type = 0;
+
         if (preg_match('/image/', $mime)) {
-            $type = 1;
+            $type = self::MIME_IMAGE;
             $filepath = 'image';
             $extend = self::IMAGE;
             $size = 512;
         } elseif (preg_match('/video/', $mime)) {
-            $type = 2;
+            $type = self::MIME_VIDEO;
             $filepath = 'video';
             $extend = self::VIDEO;
             $size = 1024 * 6;
         } elseif (preg_match('/audio/', $mime)) {
-            $type = 3;
+            $type = self::MIME_AUDIO;
             $filepath = 'audio';
             $extend = self::AUDIO;
             $size = 1024 * 6;
         } else {
+            $type = self::MIME_FILE;
             $filepath = 'file';
             $extend = self::FILE;
             $size = 1024 * 100;
         }
 
-        $filepath = $filepath . '/' . date('Y/m/d');
+        if ($setting) {
+            $filepath = $filepath . '/' . date('Y/m/d');
+            $this->setSavePath($filepath);
+            $this->setExtend($extend);
+            $this->setSize($size);
+        }
 
-        $this->setSavePath($filepath);
-        $this->setExtend($extend);
-        $this->setSize($size);
-
-        return $return_int ? $type : $filepath;
+        return $type;
     }
 
     /**
@@ -138,15 +155,8 @@ class UploadData
         $this->save_path = $save_path;
     }
 
-    public function setCall($call)
+    public function event(UploadEvent $event)
     {
-        $this->call = $call;
-    }
-
-    public function complete($data)
-    {
-        if (is_callable($this->call)) {
-            call_user_func($this->call, $data);
-        }
+        $this->event = $event;
     }
 }
