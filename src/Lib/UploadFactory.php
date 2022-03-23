@@ -3,6 +3,7 @@
 namespace Magein\Upload\Lib;
 
 use Illuminate\Http\UploadedFile;
+use mysql_xdevapi\Exception;
 
 
 class UploadFactory
@@ -20,39 +21,22 @@ class UploadFactory
     protected string $field = '';
 
     /**
-     * @var UploadedFile
+     * @var UploadedFile|null
      */
-    protected UploadedFile $file;
+    protected ?UploadedFile $file = null;
 
-    /**
-     * @var UploadConfig
-     */
-    protected UploadConfig $config;
-
-    /**
-     * @param UploadedFile|null $file
-     * @param UploadConfig|null $config
-     */
-    public function __construct(UploadedFile $file = null, UploadConfig $config = null)
+    public function postFile($file = 'file')
     {
-        $this->name = (string)request('name', '');
-        $this->field = (string)request('field', '');
-        if (empty($file)) {
-            $this->file = request()->file('file');
-        } else {
+        if (is_string($file)) {
+            $this->file = request()->file($file);
+        } elseif ($file instanceof UploadedFile) {
             $this->file = $file;
         }
-        $config && $this->config = $config;
-    }
 
-    public function setPostField($key)
-    {
-        $this->setFile(request()->file($key));
-    }
+        $this->name = request()->input('name', '');
+        $this->field = request()->input('field', '');
 
-    public function setFile(UploadedFile $file = null)
-    {
-        $this->file = $file;
+        return $this;
     }
 
     /**
@@ -65,6 +49,28 @@ class UploadFactory
 
     public function store()
     {
-        
+        if (empty($this->file)) {
+            $this->postFile();
+        }
+
+        $class = config('upload.default.driver') ?: 'local';
+
+        return $this->$class();
+    }
+
+    public function __call($name, $arguments)
+    {
+        $class = config('upload.' . $name . '.use');
+        try {
+            /**
+             * @var UploadDriver $driver
+             */
+            $driver = new $class();
+            $res = $driver->upload();
+        } catch (Exception $exception) {
+            $res = null;
+        }
+
+        return $res;
     }
 }

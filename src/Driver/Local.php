@@ -2,6 +2,7 @@
 
 namespace Magein\Upload\Driver;
 
+use Illuminate\Http\UploadedFile;
 use Magein\Upload\AssetPath;
 use Magein\Upload\Lib\UploadDriver;
 use Magein\Upload\Lib\UploadEvent;
@@ -11,14 +12,32 @@ use Magein\Upload\Lib\UploadConfig;
 class Local extends UploadFactory implements UploadDriver
 {
 
+    public function name()
+    {
+        return 'local';
+    }
+
     /**
      * @throws \Exception
      */
     public function upload()
     {
-        $setting = config('upload.default.setting');
+        $file = $this->file;
+        if (empty($file)) {
+            $this->postFile();
+        }
+
+        if (empty($this->file) || !$this->file instanceof UploadedFile) {
+            $this->error('请上传文件');
+        }
+
+        /**
+         * @var UploadConfig $config
+         */
+        $setting = config('upload.default.local.setting') ?: config('upload.default.setting');
         try {
-            $config = (new $setting())->uploadConfig();
+            $setting = new $setting($this->file, $this->name, $this->field);
+            $config = $setting->config();
         } catch (\Exception $exception) {
             $config = $this->config;
         }
@@ -44,12 +63,13 @@ class Local extends UploadFactory implements UploadDriver
                 $event = null;
             }
         }
-
         if (empty($event) || !$event instanceof UploadEvent) {
             $event = new UploadEvent($this->file, $this->name, $this->field);
         }
 
-        $event->before();
+        if (!$event->before()) {
+            $this->error('event before error');
+        }
 
         $size = $config->getSize();
         $ext = $config->getExtend();

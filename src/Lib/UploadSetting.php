@@ -7,16 +7,40 @@ use Illuminate\Http\UploadedFile;
 class UploadSetting
 {
     /**
+     * 上传的标记
+     * @var string
+     */
+    protected string $name = '';
+
+    /**
+     * 对应的字段信息
+     * @var string
+     */
+    protected string $field = '';
+
+    /**
+     * @var UploadedFile|null
+     */
+    protected ?UploadedFile $file = null;
+
+    public function __construct(UploadedFile $file, $name = '', $field = '')
+    {
+        $this->file = $file;
+        $this->name = $name;
+        $this->field = $field;
+    }
+
+    /**
      * 获取上传的配置信息
      * @param UploadedFile $file
      * @param $name
      * @param $filed
      * @return UploadConfig
      */
-    public function uploadConfig(UploadedFile $file, $name = '', $filed = ''): UploadConfig
+    public function config(): UploadConfig
     {
         $config = new UploadConfig();
-        $config->getMimeType($file->getMimeType());
+        $config->getMimeType($this->file->getMimeType());
         return $config;
     }
 }

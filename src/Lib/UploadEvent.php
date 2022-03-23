@@ -12,7 +12,7 @@ class UploadEvent
 
     protected string $field = '';
 
-    public function __construct(UploadedFile $file, $name = '', $filed = '')
+    public function __construct($file = null, $name = '', $filed = '')
     {
         $this->file = $file;
         $this->name = $name;
@@ -21,7 +21,7 @@ class UploadEvent
 
     public function before()
     {
-
+        return true;
     }
 
     public function success($data)

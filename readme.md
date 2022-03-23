@@ -7,13 +7,9 @@
 ```php
 
 // 保存图片路径,使用默认的驱动，具体查看配置文件
+// 配置文件中的default.driver 就是使用的驱动
+// 每一个驱动都有相应的配置文件
 \Magein\Upload\Facades\Upload::store()
-
-// 使用本地驱动进行保存
-\Magein\Upload\Facades\Upload::local(new \Magein\Upload\Lib\UploadConfig(),new \Magein\Upload\Lib\UploadEvent());
-\Magein\Upload\Facades\Upload::aliYunOss(new \Magein\Upload\Lib\UploadConfig(),new \Magein\Upload\Lib\UploadEvent());
-\Magein\Upload\Facades\Upload::qiNiuOss(new \Magein\Upload\Lib\UploadConfig(),new \Magein\Upload\Lib\UploadEvent());
-
 ```
 
 ### 配置
@@ -29,10 +25,11 @@ return [
 
     // 本地驱动的设置
     'local' => [
+        'use' => \Magein\Upload\Driver\Local::class,
         // 默认的配置文件
         'config' => \Magein\Upload\Lib\UploadConfig::class,
         // 上传的事件
-        'event' => \Magein\Upload\Lib\UploadEvent::class
+        'event' => \Magein\Upload\Lib\UploadEvent::class,
     ],
     
     // 阿里云的配置

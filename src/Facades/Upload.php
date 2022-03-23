@@ -4,8 +4,10 @@ namespace Magein\Upload\Facades;
 
 
 use Illuminate\Support\Facades\Facade;
+use Magein\Upload\Lib\UploadFactory;
 
 /**
+ * @method static UploadFactory postFile();
  * @method static store();
  * @method static local();
  * @method static aliYunOss();

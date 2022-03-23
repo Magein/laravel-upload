@@ -18,7 +18,7 @@ class UploadServiceProvider extends ServiceProvider implements DeferrableProvide
         $this->mergeConfigFrom(__DIR__ . '/Config.php', 'upload');
 
         $this->app->singleton('upload', function () {
-            return new UploadFactory();
+            return new UploadFactory(null, null);
         });
     }
 
@@ -34,6 +34,6 @@ class UploadServiceProvider extends ServiceProvider implements DeferrableProvide
 
     public function provides()
     {
-        return ['map'];
+        return ['upload'];
     }
 }
