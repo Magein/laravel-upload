@@ -2,12 +2,9 @@
 
 namespace Magein\Upload\Driver;
 
-use Illuminate\Http\UploadedFile;
 use Magein\Upload\AssetPath;
 use Magein\Upload\Lib\UploadDriver;
-use Magein\Upload\Lib\UploadEvent;
 use Magein\Upload\Lib\UploadFactory;
-use Magein\Upload\Lib\UploadConfig;
 
 class Local extends UploadFactory implements UploadDriver
 {

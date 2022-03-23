@@ -10,10 +10,10 @@ use mysql_xdevapi\Exception;
 class UploadFactory
 {
     /**
-     * 上传的标记
+     * 上传的场景
      * @var string
      */
-    protected string $name = '';
+    protected string $scene = '';
 
     /**
      * 对应的字段信息
@@ -64,7 +64,7 @@ class UploadFactory
             $this->file = $file;
         }
 
-        $this->name = request()->input('name', '');
+        $this->scene = request()->input('name', '');
         $this->field = request()->input('field', '');
 
         return $this;
@@ -87,7 +87,25 @@ class UploadFactory
             $this->postFile();
         }
 
-        $class = config('upload.default.driver') ?: 'local';
+        $scene = config('upload.default.scene');
+        if (empty($scene)) {
+            $class = config('upload.default.driver') ?: 'local';
+        } else {
+            /**
+             * @var UploadScene $scene
+             */
+            try {
+                $scene = new $scene();
+                $class = $scene->driver($this->scene, $this->field);
+            } catch (\Exception $exception) {
+                $class = null;
+            }
+        }
+
+        if (empty($class)) {
+            $class = 'local';
+        }
+
 
         return $this->$class(...$params);
     }
@@ -100,12 +118,12 @@ class UploadFactory
              * @var UploadDriver $driver
              */
             $driver = new $class($arguments);
-            $res = $driver->upload();
+            return $driver->upload();
         } catch (Exception $exception) {
-            $res = null;
+
         }
 
-        return $res;
+        return null;
     }
 
     protected function upload()

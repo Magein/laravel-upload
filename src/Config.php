@@ -5,7 +5,9 @@ return [
      * 默认的配置文件
      */
     'default' => [
-        // 默认的驱动
+        // 上传的场景使用的驱动
+        'scene' => \Magein\Upload\Lib\UploadScene::class,
+        // 默认的驱动,优先使用场景之匹配的
         'driver' => 'local',
         // 获取config的类
         'setting' => \Magein\Upload\Lib\UploadSetting::class,
@@ -24,6 +26,11 @@ return [
 
     'aliyun' => [
         'use' => \Magein\Upload\Driver\AliYunOss::class,
+
+        'access_key_id' => '',
+        'access_key_secret' => '',
+        'endpoint' => '',
+        'bucket' => ''
     ],
 
     'qiniu' => [
