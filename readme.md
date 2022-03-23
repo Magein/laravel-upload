@@ -9,7 +9,7 @@
 // 保存图片路径,使用默认的驱动，具体查看配置文件
 \Magein\Upload\Facades\Upload::store()
 
-// 传递参数
+// 传递参数第一个是setting，第二个是event
 \Magein\Upload\Facades\Upload::store(\Magein\Upload\Lib\UploadSetting::class, \Magein\Upload\Lib\UploadEvent::class)
 
 ```

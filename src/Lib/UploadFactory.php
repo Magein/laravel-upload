@@ -2,6 +2,7 @@
 
 namespace Magein\Upload\Lib;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\UploadedFile;
 use mysql_xdevapi\Exception;
 
@@ -74,7 +75,10 @@ class UploadFactory
      */
     protected function error($message, $code = 1)
     {
-        throw new \Exception($message, $code = 1);
+        throw new HttpResponseException(response([
+            'code' => 1,
+            'msg' => $message
+        ], 200));
     }
 
     public function store(...$params)
@@ -119,21 +123,22 @@ class UploadFactory
         if (empty($setting)) {
             $setting = config('upload.default.local.setting') ?: config('upload.default.setting');
         }
+
         try {
             $setting = new $setting($this->file, $this->name, $this->field);
+            // 这里得到的就是config的实例，不需要在new了
             $config = $setting->config();
         } catch (\Exception $exception) {
-            $config = $this->config;
+            $config = null;
         }
 
-        $config = null;
         if (empty($config)) {
             $config = config('upload.' . $this->name() . '.config') ?: config('upload.default.config');
-        }
-        try {
-            $config = new $config();
-        } catch (\Exception $exception) {
-            $config = null;
+            try {
+                $config = new $config();
+            } catch (\Exception $exception) {
+                $config = null;
+            }
         }
 
         if (empty($config) || !$config instanceof UploadConfig) {
@@ -142,19 +147,21 @@ class UploadFactory
         $this->uploadConfig = $config;
 
         $event = $this->event;
+
         if (empty($event)) {
             $event = config('upload.' . $this->name() . '.event') ?: config('upload.default.event');
         }
+
         try {
-            $event = new $event();
+            $event = new $event($this->file, $this->name, $this->field);
         } catch (\Exception $exception) {
             $event = null;
         }
         if (empty($event) || !$event instanceof UploadEvent) {
             $event = new UploadEvent($this->file, $this->name, $this->field);
         }
-        $this->uploadEvent = $event;
 
+        $this->uploadEvent = $event;
         $size = $config->getSize();
         $ext = $config->getExtend();
         $allow_size = $size * 1024;
@@ -166,7 +173,7 @@ class UploadFactory
         if ($ext && !in_array($origin_ext, $ext)) {
             $this->error('不允许的文件类型');
         }
-        
+
         // 设置文件的保存路径
         $filepath = $this->uploadConfig->getSavePath();
         if (empty($filepath)) {
