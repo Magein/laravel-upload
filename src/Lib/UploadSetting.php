@@ -7,10 +7,10 @@ use Illuminate\Http\UploadedFile;
 class UploadSetting
 {
     /**
-     * 上传的标记
+     * 上传的场景标记
      * @var string
      */
-    protected string $name = '';
+    protected string $scene = '';
 
     /**
      * 对应的字段信息
@@ -23,10 +23,10 @@ class UploadSetting
      */
     protected ?UploadedFile $file = null;
 
-    public function __construct(UploadedFile $file, $name = '', $field = '')
+    public function __construct(UploadedFile $file, $scene = '', $field = '')
     {
         $this->file = $file;
-        $this->name = $name;
+        $this->scene = $scene;
         $this->field = $field;
     }
 

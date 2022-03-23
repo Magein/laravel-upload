@@ -76,7 +76,7 @@ class UploadFactory
     protected function error($message, $code = 1)
     {
         throw new HttpResponseException(response([
-            'code' => 1,
+            'code' => $code,
             'msg' => $message
         ], 200));
     }
@@ -106,13 +106,12 @@ class UploadFactory
             $class = 'local';
         }
 
-
         return $this->$class(...$params);
     }
 
     public function __call($name, $arguments)
     {
-        $class = config('upload.' . $name . '.use');
+        $class = config('upload.driver.' . $name);
         try {
             /**
              * @var UploadDriver $driver
@@ -140,6 +139,7 @@ class UploadFactory
         $setting = $this->setting;
         if (empty($setting)) {
             $setting = config('upload.default.local.setting') ?: config('upload.default.setting');
+            $setting = $setting ?: UploadSetting::class;
         }
 
         try {
@@ -152,6 +152,7 @@ class UploadFactory
 
         if (empty($config)) {
             $config = config('upload.' . $this->name() . '.config') ?: config('upload.default.config');
+            $config = $config ?: UploadConfig::class;
             try {
                 $config = new $config();
             } catch (\Exception $exception) {
@@ -165,18 +166,18 @@ class UploadFactory
         $this->uploadConfig = $config;
 
         $event = $this->event;
-
         if (empty($event)) {
             $event = config('upload.' . $this->name() . '.event') ?: config('upload.default.event');
+            $event = $event ?: UploadEvent::class;
         }
 
         try {
-            $event = new $event($this->file, $this->name, $this->field);
+            $event = new $event($this->file, $this->scene, $this->field);
         } catch (\Exception $exception) {
             $event = null;
         }
         if (empty($event) || !$event instanceof UploadEvent) {
-            $event = new UploadEvent($this->file, $this->name, $this->field);
+            $event = new UploadEvent($this->file, $this->scene, $this->field);
         }
 
         $this->uploadEvent = $event;

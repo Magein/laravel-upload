@@ -8,14 +8,22 @@ class UploadEvent
 {
     protected ?UploadedFile $file = null;
 
-    protected string $name = '';
+    /**
+     * 使用的场景
+     * @var string
+     */
+    protected string $scene = '';
 
+    /**
+     * 对应的字段信息
+     * @var string|mixed
+     */
     protected string $field = '';
 
-    public function __construct($file = null, $name = '', $filed = '')
+    public function __construct($file = null, $scene = '', $filed = '')
     {
         $this->file = $file;
-        $this->name = $name;
+        $this->scene = $scene;
         $this->field = $filed;
     }
 

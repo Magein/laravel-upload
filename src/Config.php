@@ -9,24 +9,26 @@ return [
         'scene' => \Magein\Upload\Lib\UploadScene::class,
         // 默认的驱动,优先使用场景之匹配的
         'driver' => 'local',
-        // 获取config的类
-        'setting' => \Magein\Upload\Lib\UploadSetting::class,
         // 默认的配置文件
         'config' => \Magein\Upload\Lib\UploadConfig::class,
         // 上传的事件
         'event' => \Magein\Upload\Lib\UploadEvent::class,
     ],
 
+    'driver' => [
+        'local' => \Magein\Upload\Driver\Local::class,
+        'aliyun' => \Magein\Upload\Driver\AliYunOss::class,
+        'qiniu' => \Magein\Upload\Driver\QiNiuOss::class,
+    ],
+
     // 本地驱动的设置
     'local' => [
-        'use' => \Magein\Upload\Driver\Local::class,
-        // 获取config的类
-        'setting' => \Magein\Upload\Lib\UploadSetting::class,
+        'scene' => '',
+        'config' => '',
+        'event' => ''
     ],
 
     'aliyun' => [
-        'use' => \Magein\Upload\Driver\AliYunOss::class,
-
         'access_key_id' => '',
         'access_key_secret' => '',
         'endpoint' => '',
@@ -34,6 +36,8 @@ return [
     ],
 
     'qiniu' => [
-        'use' => \Magein\Upload\Driver\QiNiuOss::class,
+        'scene' => '',
+        'config' => '',
+        'event' => ''
     ]
 ];

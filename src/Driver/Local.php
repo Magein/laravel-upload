@@ -41,4 +41,9 @@ class Local extends UploadFactory implements UploadDriver
         $this->uploadEvent->final();
         return $data;
     }
+
+    public function base64()
+    {
+
+    }
 }
