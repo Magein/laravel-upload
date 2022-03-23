@@ -8,10 +8,10 @@ use Magein\Upload\Lib\UploadFactory;
 
 /**
  * @method static UploadFactory postFile();
- * @method static store();
- * @method static local();
- * @method static aliYunOss();
- * @method static qiNiuOss();
+ * @method static store($params = null);
+ * @method static local($params = null);
+ * @method static aliYunOss($params = null);
+ * @method static qiNiuOss($params = null);
  */
 class Upload extends Facade
 {

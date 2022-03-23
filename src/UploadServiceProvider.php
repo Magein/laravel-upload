@@ -18,7 +18,7 @@ class UploadServiceProvider extends ServiceProvider implements DeferrableProvide
         $this->mergeConfigFrom(__DIR__ . '/Config.php', 'upload');
 
         $this->app->singleton('upload', function () {
-            return new UploadFactory(null, null);
+            return new UploadFactory();
         });
     }
 

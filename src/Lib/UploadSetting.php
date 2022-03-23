@@ -31,10 +31,6 @@ class UploadSetting
     }
 
     /**
-     * 获取上传的配置信息
-     * @param UploadedFile $file
-     * @param $name
-     * @param $filed
      * @return UploadConfig
      */
     public function config(): UploadConfig

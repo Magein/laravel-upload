@@ -48,9 +48,6 @@ class UploadConfig
      */
     public function __construct(string $save_path = '', $extend = ['png', 'jpg', 'gif'], int $size = 512)
     {
-        if (empty($save_path)) {
-            $save_path = date('Y/m/d');
-        }
         $this->setSavePath($save_path);
         $this->setExtend($extend);
         $this->setSize($size);
@@ -64,7 +61,6 @@ class UploadConfig
      */
     public function getMimeType(string $mime, bool $setting = true): int
     {
-
         if (preg_match('/image/', $mime)) {
             $type = self::MIME_IMAGE;
             $filepath = 'image';
@@ -86,6 +82,7 @@ class UploadConfig
             $extend = self::FILE;
             $size = 1024 * 100;
         }
+
 
         if ($setting) {
             $filepath = $filepath . '/' . date('Y/m/d');
@@ -146,17 +143,12 @@ class UploadConfig
      */
     public function setSavePath(string $save_path, bool $is_public = true)
     {
-        $save_path = trim($save_path, '/');
-
-        if ($is_public) {
-            $save_path = 'public/' . $save_path;
+        if ($save_path) {
+            $save_path = trim($save_path, '/');
+            if ($is_public) {
+                $save_path = 'public/' . $save_path;
+            }
+            $this->save_path = $save_path;
         }
-
-        $this->save_path = $save_path;
-    }
-
-    public function event(UploadEvent $event)
-    {
-        $this->event = $event;
     }
 }
