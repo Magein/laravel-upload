@@ -16,7 +16,9 @@
   "require": {
     "php": "^7.4|^8.0",
     "ext-json": "*",
-    "laravel/framework": "~8.54",
+    "laravel/framework": "~8.54"
+  },
+  "require-dev": {
     "aliyuncs/oss-sdk-php": "~2"
   },
   "autoload": {

@@ -27,10 +27,10 @@ class UploadFactory
     protected ?UploadedFile $file = null;
 
     /**
-     * 获取config的setting类
+     * 获取config的类
      * @var string
      */
-    protected $setting = '';
+    protected $config = '';
 
     /**
      * @var UploadConfig|null
@@ -51,7 +51,7 @@ class UploadFactory
     public function __construct($arguments = [])
     {
         if ($arguments) {
-            $this->setting = $arguments[0] ?? null;
+            $this->config = $arguments[0] ?? null;
             $this->event = $arguments[1] ?? null;
         }
     }
@@ -95,8 +95,9 @@ class UploadFactory
              * @var UploadScene $scene
              */
             try {
-                $scene = new $scene();
-                $class = $scene->driver($this->scene, $this->field);
+                $scene = new $scene($this->file, $this->scene, $this->field);
+                $class = $scene->driver();
+                $params[0] = $scene->config();
             } catch (\Exception $exception) {
                 $class = null;
             }
@@ -136,51 +137,36 @@ class UploadFactory
             $this->error('请上传文件');
         }
 
-        $setting = $this->setting;
-        if (empty($setting)) {
-            $setting = config('upload.default.local.setting') ?: config('upload.default.setting');
-            $setting = $setting ?: UploadSetting::class;
-        }
+        $config = $this->config ?: (config('upload.' . $this->name() . '.config')
+            ?: (config('upload.default.config') ?: UploadConfig::class));
 
-        try {
-            $setting = new $setting($this->file, $this->name, $this->field);
-            // 这里得到的就是config的实例，不需要在new了
-            $config = $setting->config();
-        } catch (\Exception $exception) {
-            $config = null;
-        }
-
-        if (empty($config)) {
-            $config = config('upload.' . $this->name() . '.config') ?: config('upload.default.config');
-            $config = $config ?: UploadConfig::class;
+        if ($config && is_string($config)) {
             try {
                 $config = new $config();
             } catch (\Exception $exception) {
                 $config = null;
             }
         }
-
-        if (empty($config) || !$config instanceof UploadConfig) {
+        if (!$config instanceof UploadConfig) {
             $this->error('实例化配置文件失败');
         }
         $this->uploadConfig = $config;
 
-        $event = $this->event;
-        if (empty($event)) {
-            $event = config('upload.' . $this->name() . '.event') ?: config('upload.default.event');
-            $event = $event ?: UploadEvent::class;
+        $event = $this->event ?: (config('upload.' . $this->name() . '.event') ?: (config('upload.default.event') ?: UploadEvent::class));
+
+        if ($event && is_string($event)) {
+            try {
+                $event = new $event($this->file, $this->scene, $this->field);
+            } catch (\Exception $exception) {
+                $event = null;
+            }
         }
 
-        try {
-            $event = new $event($this->file, $this->scene, $this->field);
-        } catch (\Exception $exception) {
-            $event = null;
+        if (!$event instanceof UploadEvent) {
+            $this->error('实例化上传事件类失败');
         }
-        if (empty($event) || !$event instanceof UploadEvent) {
-            $event = new UploadEvent($this->file, $this->scene, $this->field);
-        }
-
         $this->uploadEvent = $event;
+
         $size = $config->getSize();
         $ext = $config->getExtend();
         $allow_size = $size * 1024;
